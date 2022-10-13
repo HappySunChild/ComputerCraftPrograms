@@ -19,7 +19,7 @@ local function install()
     fs.makeDir("os/programs")
 
     local basePrograms = {
-        [".boot"] = 
+        [".boot"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/.boot.lua"
     }
 
     for program, url in pairs(basePrograms) do
