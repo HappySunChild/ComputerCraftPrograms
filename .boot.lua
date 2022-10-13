@@ -23,6 +23,7 @@ local function install()
     }
 
     for program, url in pairs(basePrograms) do
+        print(string.format("wget %s %s", url, program))
         shell.run(string.format("wget %s %s", url, program))
     end
 end
