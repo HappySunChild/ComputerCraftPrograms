@@ -41,31 +41,46 @@ local mainMenu = {
     { "UNINSTALL" }
 }
 
-mod.optionSelect(mainMenu, 0, false, function(selected, element)
-    local option = element[1] or selected
+local active = true
 
-    if option == "LOG IN" then
-        clear()
-        local user = prompt("Enter User: ")
+while active do
+    mod.optionSelect(mainMenu, 0, true, function(selected, element)
+        local option = element[1] or selected
 
-        if user then
-            print("Thank you for logging in!")
-
-            sleep(1)
-
+        if option == "LOG IN" then
             clear()
+            local user = prompt("Enter User: ")
+
+            if user then
+                print("Thank you for logging in!")
+
+                sleep(1)
+
+                clear()
+            end
+        elseif option == "SHUTDOWN" then
+            active = false
+
+            os.shutdown()
+        elseif option == "COMMAND" then
+            active = false
+
+            shell.run("os/programs/command")
+        elseif option == "UPDATE" then
+            active = false
+
+            mod.clear()
+
+            shell.run("os/programs/boot update")
+            shell.run("reboot")
+        elseif option == "UNINSTALL" then
+            active = false
+
+            mod.clear()
+
+            fs.delete("os")
+            fs.delete("startup.lua")
+            fs.delete("back")
         end
-    elseif option == "SHUTDOWN" then
-        os.shutdown()
-    elseif option == "COMMAND" then
-        shell.run("os/programs/command")
-    elseif option == "UPDATE" then
-        clear()
-        shell.run("os/programs/boot update")
-        shell.run("reboot")
-    elseif option == "UNINSTALL" then
-        clear()
-        fs.delete("os")
-        fs.delete("startup.lua")
-    end
-end)
+    end)
+end
