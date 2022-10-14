@@ -19,12 +19,12 @@ local function install()
     fs.makeDir("os/programs")
 
     local basePrograms = {
-        [".boot"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/.boot.lua"
+        ["boot"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/boot.lua"
     }
 
     for program, url in pairs(basePrograms) do
         print(string.format("wget %s %s", url, program))
-        shell.run(string.format("wget %s %s", url, program))
+        shell.run(string.format("wget %s os/programs/%s", url, program))
     end
 end
 
