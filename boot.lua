@@ -32,7 +32,9 @@ if method == nil then
     if not fs.exists("os") then
         install()
 
-        fs.move(".boot", "os/.boot")
+        if fs.exists("boot") then
+            fs.move("boot", "os/boot")
+        end
     end
 
     term.clear()
