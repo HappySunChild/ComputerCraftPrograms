@@ -1,5 +1,4 @@
----@diagnostic disable: undefined-field
-
+local mod = require("os.mod")
 local w, h = term.getSize()
 
 local function clear()
@@ -27,73 +26,46 @@ local function printCenter(y, text, color, slow, rate)
     end
 end
 
-local function optionSelect(options, offset, exitOnSelect, selectCallback, keyCallback)
-    local currentSelected = 1
-    local lastSelected = 1
-    local startY = math.floor((h - #options) / 2) + (offset or 0)
-
-    for i, option in pairs(options) do
-        local text, color = option[1], option[2]
-
-        if i == currentSelected then
-            text = string.format("[ %s ]", text)
-        end
-
-        printCenter(startY + i, text, option[2])
-    end
-
-    while true do
-        local _, keycode = os.pullEvent("key")
-        local key = keys.getName(keycode)
-
-        lastSelected = currentSelected
-
-        if key == "up" or key == "down" then
-            if key == "up" then
-                currentSelected = currentSelected - 1
-
-                if currentSelected < 1 then
-                    currentSelected = #options
-                end
-            elseif key == "down" then
-                currentSelected = currentSelected + 1
-
-                if currentSelected > #options then
-                    currentSelected = 1
-                end
-            end
-
-            local currentElement = options[currentSelected]
-            local lastElement = options[lastSelected]
-
-            if currentElement and lastElement then
-                local cOption = currentElement[1]
-                local lOption, lColor = lastElement[1], lastElement[2]
-
-                printCenter(currentSelected + startY, string.format("[ %s ]", cOption))
-                printCenter(lastSelected + startY, lOption, lColor)
-            end
-        end
-
-        if key == "enter" then
-            pcall(selectCallback, currentSelected, options[currentSelected])
-
-            if exitOnSelect then
-                clear()
-                break
-            end
-        end
-
-        if keyCallback then
-            pcall(keyCallback, key, currentSelected)
-        end
-    end
+local function prompt(text)
+    term.write(text)
+    return read()
 end
 
 clear()
 
 local mainMenu = {
-    { "LOG IN" }
+    { "LOG IN" },
+    { "COMMAND" },
+    { "SHUTDOWN" },
+    { "UPDATE" },
+    { "UNINSTALL" }
 }
 
-optionSelect(mainMenu)
+mod.optionSelect(mainMenu, 0, false, function(selected, element)
+    local option = element[1] or selected
+
+    if option == "LOG IN" then
+        clear()
+        local user = prompt("Enter User: ")
+
+        if user then
+            print("Thank you for logging in!")
+
+            sleep(1)
+
+            clear()
+        end
+    elseif option == "SHUTDOWN" then
+        os.shutdown()
+    elseif option == "COMMAND" then
+        shell.run("os/programs/command")
+    elseif option == "UPDATE" then
+        clear()
+        shell.run("os/programs/boot update")
+        shell.run("reboot")
+    elseif option == "UNINSTALL" then
+        clear()
+        fs.delete("os")
+        fs.delete("startup.lua")
+    end
+end)
