@@ -20,8 +20,8 @@ function mod.printCenter(y, text, color, slow, rate)
     end
 
     if not slow then
-        term.clearLine()
         term.setCursorPos(math.floor((w - string.len(text)) / 2), y)
+        term.clearLine()
         term.write(text)
     else
         term.setCursorPos(math.floor((w - string.len(text)) / 2), y)
