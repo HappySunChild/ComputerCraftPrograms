@@ -22,7 +22,7 @@ local function install()
         ["os/programs/boot"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/boot.lua",
         ["os/programs/main"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/main.lua",
         ["os/programs/command"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/commands.lua",
-        ["os/mod"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/osModule.lua",
+        ["os/programs/mod"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/osModule.lua",
         ["back"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/back.lua",
         ["startup.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/startup.lua"
     }
