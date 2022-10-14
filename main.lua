@@ -1,4 +1,4 @@
-local mod = require("os.mod")
+local mod = require("mod")
 local w, h = term.getSize()
 
 local function clear()
