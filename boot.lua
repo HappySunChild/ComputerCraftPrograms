@@ -3,6 +3,7 @@ local args = { ... }
 local method = args[1]
 
 local w, h = term.getSize()
+local mod = require("os.mod")
 
 local function printCenter(y, text, slow)
     if not slow then
@@ -50,11 +51,11 @@ if method == nil then
     sleep(0.1)
     printCenter(3, "########", true)
 
-    sleep(0.1)
+    sleep(1)
 
     printCenter(5, "LOADING COMPLETE")
 
-    sleep(0.3)
+    sleep(2.85)
 
     shell.run("os/programs/main")
 elseif method == "update" then
@@ -62,5 +63,5 @@ elseif method == "update" then
 
     install()
 
-    shell.run("os/.boot")
+    shell.run("reboot")
 end
