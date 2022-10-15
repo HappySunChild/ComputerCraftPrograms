@@ -1,14 +1,8 @@
 local lamps = {
-    "orange",
-    "magenta",
-    "light_blue",
-    "yellow",
-    "lime",
-    "pink",
-    "purple",
-    "blue",
     "red",
-    "green"
+    "orange",
+    "yellow",
+    "blue"
 }
 
 local lampBase = "projectred-illumination:%s_illumar_lamp"
@@ -38,9 +32,7 @@ local function disco()
 end
 
 local function music()
-    shell.run("player play dfpwm JELLY")
-
-    sleep(153)
+    shell.run("player play dfpwm JELLY 4")
 end
 
 parallel.waitForAny(disco, music)
