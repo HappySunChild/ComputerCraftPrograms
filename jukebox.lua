@@ -3,6 +3,10 @@
 local speaker = peripheral.find("speaker")
 local dfpwm = require("cc.audio.dfpwm") -- This requires CC:Tweaked 100 or higher because of this module
 
+local args = { ... }
+
+local runMethod = args[1]
+
 term.clear()
 term.setCursorPos(1, 1)
 
@@ -42,6 +46,18 @@ local MENU = {
     { "EXIT", colors.red },
     { "UPDATE", colors.brown }
 }
+
+function table.find(t, v)
+    if t and v then
+        for i, o in pairs(t) do
+            if o == v then
+                return i
+            end
+        end
+    end
+
+    return nil
+end
 
 function colors.random()
     local rand = math.random(1, 16)
@@ -188,23 +204,25 @@ local function getCustomDFPWM()
 end
 
 local function playCustomAudio(path)
-    local decoder = dfpwm.make_decoder()
+    coroutine.wrap(function()
+        local decoder = dfpwm.make_decoder()
 
-    for input in io.lines("custom/" .. path, 16 * 1024) do
-        local decoded = decoder(input)
+        for input in io.lines("custom/" .. path, 16 * 1024) do
+            local decoded = decoder(input)
 
-        for i, amp in pairs(decoded) do
-            decoded[i] = math.min(math.max(decoded[i] * tonumber(volume), -127), 127)
+            for i, amp in pairs(decoded) do
+                decoded[i] = math.min(math.max(decoded[i] * tonumber(volume), -127), 127)
 
-            if math.abs(decoded[i]) < 2 then
-                decoded[i] = decoded[i] / 2
+                if math.abs(decoded[i]) < 2 then
+                    decoded[i] = decoded[i] / 2
+                end
+            end
+
+            while not speaker.playAudio(decoded, tonumber(volume)) do
+                os.pullEvent("speaker_audio_empty")
             end
         end
-
-        while not speaker.playAudio(decoded, tonumber(volume)) do
-            os.pullEvent("speaker_audio_empty")
-        end
-    end
+    end)()
 end
 
 local function downloadDFPWM(link, name) -- you will need to change your config to download most DFPWM files
@@ -350,237 +368,254 @@ end
 local menuCurrent = 1
 local savedCurrent = 1
 
-local active = true
+if runMethod == "play" then
+    local mode = args[2]
+    local file = args[3]
 
-while active do
-    optionSelect(MENU, menuCurrent, 2, "Menu Options", colors.pink, nil, true, function(selected, element)
-        local button = element[1]
-        menuCurrent = selected
-
-        if button == "RECORDS" then
-            optionSelect(RECORDS, 1, 2, "All Records", colors.green, "x", false, function(selected, element)
-                playSound("music_disc." .. element[1])
-            end)
-        elseif button == "SAVES" then
-            if not fs.exists("saved.txt") then
-                createSaveFile()
+    if mode and file then
+        if mode == "dfpwm" then
+            if fs.exists("custom/" .. file) then
+                playCustomAudio(file)
             end
+        elseif mode == "record" then
+            printcenter(5, "not available")
+        end
+    end
+else
+    local active = true
 
-            local saved = getSaved()
+    while active do
+        optionSelect(MENU, menuCurrent, 2, "Menu Options", colors.pink, nil, true, function(selected, element)
+            local button = element[1]
+            menuCurrent = selected
 
-            term.clear()
-            term.setCursorPos(1, 1)
-
-            if #saved == 0 then
-                printcenter(13, "No saves detected", colors.red)
-                printcenter(19, "press any key to exit.")
-            end
-
-            if saved ~= nil and #saved > 0 then
-                optionSelect(saved, 1, 2, "All Saves", colors.lime, "x", false, function(selected, element)
-                    playSound(element[3])
+            if button == "RECORDS" then
+                optionSelect(RECORDS, 1, 2, "All Records", colors.green, "x", false, function(selected, element)
+                    playSound("music_disc." .. element[1])
                 end)
-            end
+            elseif button == "SAVES" then
+                if not fs.exists("saved.txt") then
+                    createSaveFile()
+                end
 
-            if #saved == 0 then
-                os.pullEvent("key")
+                local saved = getSaved()
 
                 term.clear()
-            end
-        elseif button == "ADD SAVE" then
-            term.clear()
-            term.setCursorPos(1, 1)
-            term.setTextColor(colors.yellow)
+                term.setCursorPos(1, 1)
 
-            local id = promptInput("Input json id: ")
-            local name = promptInput("Input name: ")
+                if #saved == 0 then
+                    printcenter(13, "No saves detected", colors.red)
+                    printcenter(19, "press any key to exit.")
+                end
 
-            if isValidId(id) then
-                term.clear()
+                if saved ~= nil and #saved > 0 then
+                    optionSelect(saved, 1, 2, "All Saves", colors.lime, "x", false, function(selected, element)
+                        playSound(element[3])
+                    end)
+                end
 
-                printcenter(5, "Saved", colors.lime)
-                printcenter(6, id, colors.green)
-                printcenter(7, "as", colors.lime)
-                printcenter(8, name, colors.green)
-
-                addToSaveFile({ id, name, colors.random() })
-
-                speaker.playNote("bit", 1, 16)
-                sleep(0.15)
-                speaker.playNote("bit", 2, 20)
-                sleep(0.1)
-                speaker.playNote("bit", 2, 24)
-
-                sleep(1)
-            else
-                term.clear()
-
-                printcenter(6, "not a valid id!", colors.red)
-
-                speaker.playNote("bit", 2, 0.05)
-                sleep(0.2)
-                speaker.playNote("bit", 2, 0.05)
-
-                sleep(1)
-            end
-        elseif button == "VOLUME" then
-            term.clear()
-            term.setCursorPos(1, 1)
-            term.setTextColor(colors.yellow)
-
-            volume = promptInput("Input volume: ")
-        elseif button == "PITCH" then
-            term.clear()
-            term.setCursorPos(1, 1)
-            term.setTextColor(colors.yellow)
-
-            pitch = promptInput("Input pitch: ")
-        elseif button == "STOP" then
-            speaker.stop()
-        elseif button == "REMOVE ALL SAVES" then
-            term.clear()
-            optionSelect({ { "Yes", colors.green }, { "No", colors.red } }, 1, 3, "Are you sure?", colors.blue, nil, true
-                , function(selected, element)
-                if selected == 1 then
-                    clearSaveFile()
+                if #saved == 0 then
+                    os.pullEvent("key")
 
                     term.clear()
-                    printcenter(7, "Wiped Save File", colors.red)
+                end
+            elseif button == "ADD SAVE" then
+                term.clear()
+                term.setCursorPos(1, 1)
+                term.setTextColor(colors.yellow)
 
-                    speaker.playNote("bit", 2, 24)
-                    sleep(0.1)
-                    speaker.playNote("bit", 2, 20)
-                    sleep(0.11)
+                local id = promptInput("Input json id: ")
+                local name = promptInput("Input name: ")
+
+                if isValidId(id) then
+                    term.clear()
+
+                    printcenter(5, "Saved", colors.lime)
+                    printcenter(6, id, colors.green)
+                    printcenter(7, "as", colors.lime)
+                    printcenter(8, name, colors.green)
+
+                    addToSaveFile({ id, name, colors.random() })
+
                     speaker.playNote("bit", 1, 16)
+                    sleep(0.15)
+                    speaker.playNote("bit", 2, 20)
+                    sleep(0.1)
+                    speaker.playNote("bit", 2, 24)
+
+                    sleep(1)
+                else
+                    term.clear()
+
+                    printcenter(6, "not a valid id!", colors.red)
+
+                    speaker.playNote("bit", 2, 0.05)
+                    sleep(0.2)
+                    speaker.playNote("bit", 2, 0.05)
 
                     sleep(1)
                 end
-            end)
-        elseif button == "DFPWM FILES" then
-            if not fs.exists("custom") then
-                createCustomSavesDir()
-            end
-
-            local saved = getCustomDFPWM()
-
-            term.clear()
-            term.setCursorPos(1, 1)
-
-            if #saved == 0 then
-                printcenter(9, " No custom audios detected", colors.red)
-                printcenter(10, "inside directory", colors.red)
-                printcenter(18, "press any key to exit.")
-
-                os.pullEvent("key")
+            elseif button == "VOLUME" then
                 term.clear()
-            end
+                term.setCursorPos(1, 1)
+                term.setTextColor(colors.yellow)
 
-            if #saved > 0 then
-                optionSelect(saved, 1, 2, "All Custom Saves", colors.purple, "x", false, function(selected, element)
-                    playCustomAudio(element[1])
+                volume = promptInput("Input volume: ")
+            elseif button == "PITCH" then
+                term.clear()
+                term.setCursorPos(1, 1)
+                term.setTextColor(colors.yellow)
+
+                pitch = promptInput("Input pitch: ")
+            elseif button == "STOP" then
+                speaker.stop()
+            elseif button == "REMOVE ALL SAVES" then
+                term.clear()
+                optionSelect({ { "Yes", colors.green }, { "No", colors.red } }, 1, 3, "Are you sure?", colors.blue, nil,
+                    true
+                    , function(selected, element)
+                    if selected == 1 then
+                        clearSaveFile()
+
+                        term.clear()
+                        printcenter(7, "Wiped Save File", colors.red)
+
+                        speaker.playNote("bit", 2, 24)
+                        sleep(0.1)
+                        speaker.playNote("bit", 2, 20)
+                        sleep(0.11)
+                        speaker.playNote("bit", 1, 16)
+
+                        sleep(1)
+                    end
                 end)
-            end
-        elseif button == "CUSTOM RECORDS" then
-            if not fs.exists("records.save") then
-                createSaveFile()
-            end
+            elseif button == "DFPWM FILES" then
+                if not fs.exists("custom") then
+                    createCustomSavesDir()
+                end
 
-            term.clear()
-            term.setCursorPos(1, 1)
-
-            local saved = getCustomRecords()
-
-            if #saved == 0 then
-                printcenter(13, "No saved detected", colors.red)
-                printcenter(19, "press any key to exit.")
-
-                os.pullEvent()
-                term.clear()
-            else
-                optionSelect(formatData(saved), 1, 2, "Custom Records", colors.purple, "x", false,
-                    function(selected)
-                        playSound(saved[selected].id)
-                    end)
-            end
-        elseif button == "ADD RECORD" then
-            if not fs.exists("records.save") then
-                createSaveFile()
-            end
-
-            term.clear()
-            term.setCursorPos(1, 1)
-            term.setTextColor(colors.yellow)
-
-            local id = promptInput("Id: ")
-            local name = promptInput("Name: ")
-            local author = promptInput("Author (optional): ")
-            local color = promptInput("Color (optional): ")
-
-            if isValidId(id) then
-                term.clear()
-
-                printcenter(6, "Added Record", colors.green)
-                printcenter(7, "Check \"CUSTOM RECORDS\"", colors.green)
-
-                addCustomRecord(id, name, author, color)
-
-                speaker.playNote("bit", 1, 16)
-                sleep(0.15)
-                speaker.playNote("bit", 2, 20)
-                sleep(0.1)
-                speaker.playNote("bit", 2, 24)
-
-                sleep(1)
-            end
-        elseif button == "ADD DFPWM" then
-            term.clear()
-            term.setCursorPos(1, 1)
-            term.setTextColor(colors.yellow)
-
-            local link = promptInput("Link:")
-            local name = promptInput("Name: ")
-
-            if link and name then
-                downloadDFPWM(link, name)
+                local saved = getCustomDFPWM()
 
                 term.clear()
+                term.setCursorPos(1, 1)
 
-                printcenter(6, "Added DFPWM", colors.green)
-                printcenter(7, "Check \"DFPWM FILES\"", colors.green)
+                if #saved == 0 then
+                    printcenter(9, " No custom audios detected", colors.red)
+                    printcenter(10, "inside directory", colors.red)
+                    printcenter(18, "press any key to exit.")
 
-                speaker.playNote("bit", 1, 16)
-                sleep(0.15)
-                speaker.playNote("bit", 2, 20)
-                sleep(0.1)
-                speaker.playNote("bit", 2, 24)
+                    os.pullEvent("key")
+                    term.clear()
+                end
 
-                sleep(1)
+                if #saved > 0 then
+                    optionSelect(saved, 1, 2, "All Custom Saves", colors.purple, "x", false,
+                        function(selected, element)
+                            playCustomAudio(element[1])
+                        end)
+                end
+            elseif button == "CUSTOM RECORDS" then
+                if not fs.exists("records.save") then
+                    createSaveFile()
+                end
+
+                term.clear()
+                term.setCursorPos(1, 1)
+
+                local saved = getCustomRecords()
+
+                if #saved == 0 then
+                    printcenter(13, "No saved detected", colors.red)
+                    printcenter(19, "press any key to exit.")
+
+                    os.pullEvent()
+                    term.clear()
+                else
+                    optionSelect(formatData(saved), 1, 2, "Custom Records", colors.purple, "x", false,
+                        function(selected)
+                            playSound(saved[selected].id)
+                        end)
+                end
+            elseif button == "ADD RECORD" then
+                if not fs.exists("records.save") then
+                    createSaveFile()
+                end
+
+                term.clear()
+                term.setCursorPos(1, 1)
+                term.setTextColor(colors.yellow)
+
+                local id = promptInput("Id: ")
+                local name = promptInput("Name: ")
+                local author = promptInput("Author (optional): ")
+                local color = promptInput("Color (optional): ")
+
+                if isValidId(id) then
+                    term.clear()
+
+                    printcenter(6, "Added Record", colors.green)
+                    printcenter(7, "Check \"CUSTOM RECORDS\"", colors.green)
+
+                    addCustomRecord(id, name, author, color)
+
+                    speaker.playNote("bit", 1, 16)
+                    sleep(0.15)
+                    speaker.playNote("bit", 2, 20)
+                    sleep(0.1)
+                    speaker.playNote("bit", 2, 24)
+
+                    sleep(1)
+                end
+            elseif button == "ADD DFPWM" then
+                term.clear()
+                term.setCursorPos(1, 1)
+                term.setTextColor(colors.yellow)
+
+                local link = promptInput("Link:")
+                local name = promptInput("Name: ")
+
+                if link and name then
+                    downloadDFPWM(link, name)
+
+                    term.clear()
+
+                    printcenter(6, "Added DFPWM", colors.green)
+                    printcenter(7, "Check \"DFPWM FILES\"", colors.green)
+
+                    speaker.playNote("bit", 1, 16)
+                    sleep(0.15)
+                    speaker.playNote("bit", 2, 20)
+                    sleep(0.1)
+                    speaker.playNote("bit", 2, 24)
+
+                    sleep(1)
+                end
+            elseif selected == #MENU - 1 then
+                term.clear()
+                term.setCursorPos(1, 1)
+
+                active = false
+            elseif button == "UPDATE" then
+                if fs.exists("player") then
+                    fs.delete("player")
+                end
+
+                shell.run("pastebin get jw8AMtSS player")
+
+                term.clear()
+                term.setCursorPos(1, 1)
+
+                printcenter(7, "Updating...", colors.green)
+                printcenter(8, "Your saves will", colors.green)
+                printcenter(9, "stay.", colors.green)
+
+                sleep(1.5)
+
+                term.clear()
+                term.setCursorPos(1, 1)
+
+                active = false
             end
-        elseif selected == #MENU - 1 then
-            term.clear()
-            term.setCursorPos(1, 1)
-
-            active = false
-        elseif button == "UPDATE" then
-            if fs.exists("player") then
-                fs.delete("player")
-            end
-
-            shell.run("pastebin get jw8AMtSS player")
-
-            term.clear()
-            term.setCursorPos(1, 1)
-
-            printcenter(7, "Updating...", colors.green)
-            printcenter(8, "Your saves will", colors.green)
-            printcenter(9, "stay.", colors.green)
-
-            sleep(1.5)
-
-            term.clear()
-            term.setCursorPos(1, 1)
-
-            active = false
-        end
-    end)
+        end)
+    end
 end
