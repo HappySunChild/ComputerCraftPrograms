@@ -31,7 +31,10 @@ local function updateFloor()
 end
 
 local function disco()
-
+    while true do
+        updateFloor()
+        sleep(1)
+    end
 end
 
 local function music()
