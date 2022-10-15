@@ -17,7 +17,7 @@ local floorStart = { x = 273, y = 59, z = -176 }
 
 local function placeLamp(x, y, z, color)
     local lamp = string.format(lampBase, color)
-    commands.execAsync(string.format("setblock %s %s %s %s", x, y, z, lamp))
+    commands.execAsync(string.format("setblock %s %s %s %s[lit = true]", x, y, z, lamp))
 end
 
 local function updateFloor()
