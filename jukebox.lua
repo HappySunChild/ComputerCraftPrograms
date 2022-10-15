@@ -369,6 +369,11 @@ local savedCurrent = 1
 if runMethod == "play" then
     local mode = args[2]
     local file = args[3]
+    local vol = args[4]
+
+    if vol then
+        volume = tonumber(vol) or 1
+    end
 
     if mode and file then
         if mode == "dfpwm" then
