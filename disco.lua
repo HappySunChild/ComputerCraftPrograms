@@ -12,7 +12,7 @@ local lamps = {
 }
 
 local lampBase = "projectred-illumination:%s_illumar_lamp"
-local floorSize = { x = 7, z = 9 }
+local floorSize = { x = 6, z = 8 }
 local floorStart = { x = 273, y = 59, z = -176 }
 
 local function placeLamp(x, y, z, color)
