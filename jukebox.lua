@@ -600,7 +600,7 @@ else
                     fs.delete("player")
                 end
 
-                shell.run("pastebin get jw8AMtSS player")
+                shell.run("wget https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/jukebox.lua player")
 
                 term.clear()
                 term.setCursorPos(1, 1)
