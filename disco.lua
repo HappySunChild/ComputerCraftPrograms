@@ -30,6 +30,14 @@ local function updateFloor()
     end
 end
 
-updateFloor()
-sleep(1)
-updateFloor()
+local function disco()
+
+end
+
+local function music()
+    shell.run("player play dfpwm JELLY")
+
+    sleep(153)
+end
+
+parallel.waitForAny(disco, music)
