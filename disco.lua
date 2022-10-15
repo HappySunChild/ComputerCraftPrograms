@@ -1,7 +1,7 @@
 local lamps = {
     "red",
     "orange",
-    "yellow",
+    "purple",
     "blue"
 }
 
