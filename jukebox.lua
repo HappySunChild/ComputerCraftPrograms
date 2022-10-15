@@ -204,25 +204,23 @@ local function getCustomDFPWM()
 end
 
 local function playCustomAudio(path)
-    coroutine.wrap(function()
-        local decoder = dfpwm.make_decoder()
+    local decoder = dfpwm.make_decoder()
 
-        for input in io.lines("custom/" .. path, 16 * 1024) do
-            local decoded = decoder(input)
+    for input in io.lines("custom/" .. path, 16 * 1024) do
+        local decoded = decoder(input)
 
-            for i, amp in pairs(decoded) do
-                decoded[i] = math.min(math.max(decoded[i] * tonumber(volume), -127), 127)
+        for i, amp in pairs(decoded) do
+            decoded[i] = math.min(math.max(decoded[i] * tonumber(volume), -127), 127)
 
-                if math.abs(decoded[i]) < 2 then
-                    decoded[i] = decoded[i] / 2
-                end
-            end
-
-            while not speaker.playAudio(decoded, tonumber(volume)) do
-                os.pullEvent("speaker_audio_empty")
+            if math.abs(decoded[i]) < 2 then
+                decoded[i] = decoded[i] / 2
             end
         end
-    end)()
+
+        while not speaker.playAudio(decoded, tonumber(volume)) do
+            os.pullEvent("speaker_audio_empty")
+        end
+    end
 end
 
 local function downloadDFPWM(link, name) -- you will need to change your config to download most DFPWM files
