@@ -292,7 +292,7 @@ while true do
                     term.clearLine()
                     term.write("Command: ")
 
-                    local input = read():lower()
+                    local input = read()
 
                     printat(1, 6, "Command History: ", colors.lightBlue)
 
