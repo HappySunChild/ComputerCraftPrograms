@@ -86,11 +86,11 @@ while true do
         local location = args[1]
 
         if location == "up" then
-            turtle.placeUp()
+            turtle.digUp()
         elseif location == "down" then
-            turtle.placeDown()
+            turtle.digDown()
         else
-            turtle.place()
+            turtle.dig()
         end
     elseif command == "miner" then
         RunProgram("Miner.lua", args)
