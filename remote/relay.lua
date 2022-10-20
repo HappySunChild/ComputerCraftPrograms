@@ -1,6 +1,6 @@
 ---@diagnostic disable: undefined-field
 
-local modem = peripheral.find("modem", rednet.open)
+peripheral.find("modem", rednet.open)
 
 local args = { ... }
 local url = args[1]
