@@ -8,13 +8,13 @@ if disk.isPresent("top") then
     fs.copy("disk/startup.lua", "startup.lua")
 end
 
-if not fs.exists("reciever.lua") then
-    shell.run("wget https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/remote/main.lua reciever.lua")
+if not fs.exists("receiver.lua") then
+    shell.run("wget https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/remote/main.lua receiver.lua")
 end
 
 term.clear()
 term.setCursorPos(1, 1)
 
-print("Running Reciever\n------------------------------")
+print("Running Receiver\n------------------------------")
 
-shell.run("reciever.lua")
+shell.run("receiver.lua")
