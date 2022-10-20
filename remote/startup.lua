@@ -1,6 +1,10 @@
 -- probably will go into a disk
 
 if disk.isPresent("top") then
+    if fs.exists("startup.lua") then
+        fs.delete("startup.lua")
+    end
+
     fs.copy("disk/startup.lua", "startup.lua")
 end
 
