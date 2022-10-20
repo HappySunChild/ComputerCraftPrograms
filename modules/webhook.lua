@@ -32,7 +32,7 @@ function webhook:createWebhook(url, username, avatar_url)
 
     function hook:sendEmbed(embed)
         if embed then
-            return send(hook.url, { embeds = embed.data, content = "" })
+            return send(hook.url, { embeds = { embed.data }, content = "" })
         end
     end
 
