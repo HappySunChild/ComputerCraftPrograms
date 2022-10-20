@@ -39,15 +39,13 @@ end
 
 local function clear()
     while true do
-        if (os.epoch("local") / 1000) - lastReceived > 2 and #received > 0 then
+        if (os.epoch("local") / 1000) - lastReceived > 1 and #received > 0 then
             -- make a embed and send it to the url
-            local embed = hook:createEmbed("Turtle Info", "Turtle information")
+            local embed = hook:createEmbed("Turtle Info")
 
             for _, unsplit in pairs(received) do
-                local args = Split(unsplit)
+                local args = Split(unsplit, "/")
                 local label, message = args[1], args[2]
-
-                print(label, message)
 
                 embed:addField(label, message, true)
             end
