@@ -94,6 +94,10 @@ end
 
 function webhook:saveUrlToFile(url, path)
     if url then
+        if fs.exists(path) then
+            fs.delete(path)
+        end
+
         if not fs.exists(path) then
             local file = fs.open(path, "w")
             file.write(url)
