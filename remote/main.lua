@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-field
-local VERSION = 1.12
+local VERSION = 1.13
 
 peripheral.find("modem", rednet.open)
 
@@ -116,8 +116,13 @@ while true do
         url = args[2]
         hook = webhook:createWebhook(hook, os.getComputerLabel())
 
-        webhook:saveUrlToFile(url, "saved.url")
-        SendFeedback("Created `saved.url` file")
+        local success = webhook:saveUrlToFile(url, "saved.url")
+
+        if success then
+            SendFeedback("Created `saved.url` file")
+        else
+            SendFeedback(string.format("There was an error in saving the url! Extra info; URL: %s", url))
+        end
     elseif command == "drop" then
         turtle.drop()
     elseif command == "return" then
