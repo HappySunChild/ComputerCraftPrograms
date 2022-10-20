@@ -1,7 +1,6 @@
 ---@diagnostic disable: undefined-field
 
 local modem = peripheral.find("modem", rednet.open)
-assert(modem, "Missing modem")
 
 local args = { ... }
 local url = args[1]
@@ -50,6 +49,8 @@ local function clear()
 
             hook.createdEmbeds = {}
             received = {}
+        else
+            sleep()
         end
     end
 end
