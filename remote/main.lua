@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-field
-local VERSION = 1.13
+local VERSION = 1.14
 
 peripheral.find("modem", rednet.open)
 
@@ -79,6 +79,10 @@ while true do
     local args = Split(message)
     local command = args[1]
 
+    for i, arg in pairs(args) do
+        print(arg)
+    end
+
     table.remove(args, 1)
 
     if command == "go" then
@@ -114,7 +118,10 @@ while true do
         turtle.select(tonumber(args[2]) or 1)
     elseif command == "url" then
         url = args[2]
-        hook = webhook:createWebhook(hook, os.getComputerLabel())
+
+        if url then
+            hook = webhook:createWebhook(url, os.getComputerLabel())
+        end
 
         local success = webhook:saveUrlToFile(url, "saved.url")
 
