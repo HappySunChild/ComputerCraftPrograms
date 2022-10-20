@@ -117,6 +117,7 @@ while true do
         hook = webhook:createWebhook(hook, os.getComputerLabel())
 
         webhook:saveUrlToFile(url, "saved.url")
+        SendFeedback("Created `saved.url` file")
     elseif command == "drop" then
         turtle.drop()
     elseif command == "return" then
