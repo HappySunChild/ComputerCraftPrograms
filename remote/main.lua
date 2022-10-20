@@ -65,12 +65,7 @@ local function SendFeedback(feedback)
 end
 
 local function RunProgram(program, args)
-    if fs.exists(program) then
-        shell.run(program, table.unpack(args))
-    else
-        SendFeedback("Missing program; " .. program)
-        DownloadPrograms()
-    end
+    shell.run(program, table.unpack(args))
 end
 
 SendFeedback("Turned on")
