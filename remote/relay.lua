@@ -39,7 +39,7 @@ end
 
 local function clear()
     while true do
-        if (os.epoch("local") / 1000) - lastReceived > 1 and #received > 0 then
+        if (os.epoch("local") / 1000) - lastReceived > 0.3 and #received > 0 then
             -- make a embed and send it to the url
             local embed = hook:createEmbed("Turtle Info")
 
