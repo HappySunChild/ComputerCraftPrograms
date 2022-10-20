@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-field
-local VERSION = 1.20
+local VERSION = 1.21
 
 peripheral.find("modem", rednet.open)
 
@@ -38,14 +38,6 @@ end
 
 DownloadPrograms(false)
 
-local webhook = require("webhook")
-local url = webhook:getUrlFromFile("saved.url")
-local hook
-
-if url then
-    hook = webhook:createWebhook(url, os.getComputerLabel())
-end
-
 local function Split(inputstr, sep)
     if sep == nil then
         sep = "%s"
@@ -58,11 +50,41 @@ local function Split(inputstr, sep)
     return t
 end
 
+local function GetRelayIdFromFile(path)
+    if fs.exists(path) then
+        local file = fs.open(path, "r")
+        local id = file.readAll()
+        file.close()
+
+        if id then
+            return id
+        end
+    end
+
+    return nil
+end
+
+local function SetRelayIdToFile(id, path)
+    if fs.exists(path) then
+        local file = fs.open(path, "w")
+        file.write(id)
+        file.close()
+
+        return true
+    end
+
+    return false
+end
+
+local relayID = GetRelayIdFromFile("relay.save")
+
 local function SendFeedback(feedback)
-    if url and hook then -- check if there is a webhook/url
-        hook:sendMessage(feedback)
-    else -- if there isnt then just broadcast the feedback
-        rednet.broadcast(os.getComputerLabel() .. "/" .. feedback)
+    local message = string.format("Relay/%s/%s", os.getComputerLabel(), feedback)
+
+    if relayID then
+        rednet.send(relayID, message)
+    else
+        rednet.broadcast(message)
     end
 end
 
@@ -115,20 +137,6 @@ while true do
         shell.run("dance")
     elseif command == "select" then
         turtle.select(tonumber(args[1]) or 1)
-    elseif command == "url" then
-        url = args[1]
-
-        if url then
-            hook = webhook:createWebhook(url, os.getComputerLabel())
-        end
-
-        local success = webhook:saveUrlToFile(url, "saved.url")
-
-        if success then
-            SendFeedback("Created `saved.url` file")
-        else
-            SendFeedback(string.format("There was an error in saving the url! Extra info; URL: %s", url))
-        end
     elseif command == "drop" then
         turtle.drop()
     elseif command == "return" then
@@ -138,6 +146,13 @@ while true do
             SendFeedback(string.format("Current fuel level: %s.", turtle.getFuelLevel()))
         elseif stat == "version" then
             SendFeedback(string.format("Current receiver version: %s", VERSION))
+        end
+    elseif command == "relay" then
+        local id = args[1]
+
+        if id then
+            relayID = id
+            SetRelayIdToFile(id, "relay.save")
         end
     end
 end
