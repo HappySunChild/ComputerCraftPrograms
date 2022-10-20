@@ -82,7 +82,7 @@ local function SendFeedback(feedback)
     local message = string.format("Relay/%s/%s", os.getComputerLabel(), feedback)
 
     if relayID then
-        rednet.send(relayID, message)
+        rednet.send(tonumber(relayID), message)
     else
         rednet.broadcast(message)
     end
