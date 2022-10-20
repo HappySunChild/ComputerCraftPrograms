@@ -42,7 +42,6 @@ function webhook:createWebhook(url, username, avatar_url)
         embed.data = {
             title = title,
             description = description,
-            color = 0xFFFFFF,
             fields = {}
         }
 
