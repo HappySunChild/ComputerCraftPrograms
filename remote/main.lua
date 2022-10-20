@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-field
-local VERSION = 1.19
+local VERSION = 1.20
 
 peripheral.find("modem", rednet.open)
 
@@ -99,15 +99,19 @@ while true do
     elseif command == "bridge" then
         RunProgram("Bridge.lua", args)
     elseif command == "refuel" then
+        SendFeedback("Refueling...")
         RunProgram("Refuel.lua", args)
     elseif command == "update" then
+        SendFeedback("Updating...")
         DownloadPrograms(true)
         os.reboot()
     elseif command == "reboot" then
+        SendFeedback("Rebooting...")
         os.reboot()
     elseif command == "shutdown" then
         os.shutdown()
     elseif command == "dance" then
+        SendFeedback("Prepare to get down.")
         shell.run("dance")
     elseif command == "select" then
         turtle.select(tonumber(args[1]) or 1)
@@ -131,7 +135,7 @@ while true do
         local stat = args[1]
 
         if stat == "fuel" then
-            SendFeedback(turtle.getFuelLevel())
+            SendFeedback(string.format("Current fuel level: %s.", turtle.getFuelLevel()))
         end
     end
 end
