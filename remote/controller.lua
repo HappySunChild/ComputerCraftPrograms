@@ -245,6 +245,32 @@ local PRESET = {
 
 local menuSelect = 1
 
+local keymap = {
+    w = "go forward",
+    a = "go left",
+    s = "go back",
+    d = "go right",
+    e = "go up",
+    q = "go down",
+    f = "dig",
+    r = "dig up",
+    v = "dig down",
+    z = "drop"
+}
+
+local kTable = {
+    w = { at = vector2.new(13, 9), "W" },
+    a = { at = vector2.new(11, 10), "A" },
+    s = { at = vector2.new(13, 10), "S" },
+    d = { at = vector2.new(15, 10), "D" },
+    e = { at = vector2.new(15, 9), "E" },
+    q = { at = vector2.new(11, 9), "Q" },
+    f = { at = vector2.new(17, 10), "F" },
+    r = { at = vector2.new(17, 9), "R" },
+    v = { at = vector2.new(17, 11), "V" },
+    z = { at = vector2.new(19, 9), "Z" }
+}
+
 while true do
     term.clear()
 
@@ -293,21 +319,6 @@ while true do
                 printcenter(1, "Key Mode", colors.lightBlue)
                 printcenter(16, "Press x to exit.", colors.lightBlue)
 
-                local kTable = {
-                    w = { at = vector2.new(13, 9), "W" },
-                    a = { at = vector2.new(11, 10), "A" },
-                    s = { at = vector2.new(13, 10), "S" },
-                    d = { at = vector2.new(15, 10), "D" },
-                    e = { at = vector2.new(15, 9), "E" },
-                    q = { at = vector2.new(11, 9), "Q" },
-                    f = { at = vector2.new(17, 10), "F" },
-                    r = { at = vector2.new(17, 9), "R" },
-                    v = { at = vector2.new(17, 11), "V" },
-                    t = { at = vector2.new(19, 9), "T" },
-                    g = { at = vector2.new(19, 10), "G" },
-                    b = { at = vector2.new(19, 11), "B" }
-                }
-
                 for i, key in pairs(kTable) do
                     local at = key.at
                     printat(at.x, at.y, key[1], colors.red)
@@ -329,34 +340,10 @@ while true do
                         end
                     end
 
-                    local function t1()
+                    local function sendBroadcast()
                         local broadcastMessage = ""
 
-                        if downkey == "w" then
-                            broadcastMessage = "go forward"
-                        elseif downkey == "s" then
-                            broadcastMessage = "go back"
-                        elseif downkey == "a" then
-                            broadcastMessage = "go left"
-                        elseif downkey == "d" then
-                            broadcastMessage = "go right"
-                        elseif downkey == "e" then
-                            broadcastMessage = "go up"
-                        elseif downkey == "q" then
-                            broadcastMessage = "go down"
-                        elseif downkey == "r" then
-                            broadcastMessage = "dig up"
-                        elseif downkey == "f" then
-                            broadcastMessage = "dig"
-                        elseif downkey == "v" then
-                            broadcastMessage = "dig down"
-                        elseif downkey == "t" then
-                            broadcastMessage = "place up"
-                        elseif downkey == "g" then
-                            broadcastMessage = "place"
-                        elseif downkey == "b" then
-                            broadcastMessage = "place down"
-                        end
+                        broadcastMessage = keymap[downkey]
 
                         while true do
                             rednet.broadcast(broadcastMessage)
@@ -365,7 +352,7 @@ while true do
                         end
                     end
 
-                    local function t2()
+                    local function waitForKeyUp()
                         repeat
                             local _, key = os.pullEvent("key_up")
                         until downkey == keys.getName(key)
@@ -377,7 +364,7 @@ while true do
                         end
                     end
 
-                    parallel.waitForAny(t2, t1)
+                    parallel.waitForAny(waitForKeyUp, sendBroadcast)
                 end
             elseif selected == 3 then
                 term.clear()
