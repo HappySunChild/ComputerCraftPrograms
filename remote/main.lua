@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-field
-local VERSION = 1.14
+local VERSION = 1.15
 
 peripheral.find("modem", rednet.open)
 
@@ -79,16 +79,12 @@ while true do
     local args = Split(message)
     local command = args[1]
 
-    for i, arg in pairs(args) do
-        print(arg)
-    end
-
     table.remove(args, 1)
 
     if command == "go" then
         RunProgram("go", args)
     elseif command == "dig" then
-        local location = args[2]
+        local location = args[1]
 
         if location == "up" then
             turtle.placeUp()
@@ -115,9 +111,9 @@ while true do
     elseif command == "dance" then
         shell.run("dance")
     elseif command == "select" then
-        turtle.select(tonumber(args[2]) or 1)
+        turtle.select(tonumber(args[1]) or 1)
     elseif command == "url" then
-        url = args[2]
+        url = args[1]
 
         if url then
             hook = webhook:createWebhook(url, os.getComputerLabel())
@@ -133,7 +129,7 @@ while true do
     elseif command == "drop" then
         turtle.drop()
     elseif command == "return" then
-        local stat = args[2]
+        local stat = args[1]
 
         if stat == "fuel" then
             SendFeedback(turtle.getFuelLevel())
