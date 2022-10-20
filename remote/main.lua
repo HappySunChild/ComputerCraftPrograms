@@ -1,4 +1,5 @@
 ---@diagnostic disable: undefined-field
+-- VERSION 1.1
 
 peripheral.find("modem", rednet.open)
 
@@ -38,7 +39,7 @@ end
 DownloadPrograms(false)
 
 local webhook = require("webhook")
-local url = webhook:getUrlFromFile("Reciever.url")
+local url = webhook:getUrlFromFile("saved.url")
 local hook
 
 if url then
@@ -114,7 +115,7 @@ while true do
         url = args[2]
         hook = webhook:createWebhook(hook, os.getComputerLabel())
 
-        webhook:saveUrlToFile(url, "Reciever.url")
+        webhook:saveUrlToFile(url, "saved.url")
     elseif command == "drop" then
         turtle.drop()
     elseif command == "return" then
