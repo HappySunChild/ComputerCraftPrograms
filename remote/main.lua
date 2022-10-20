@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-field
-local VERSION = 1.18
+local VERSION = 1.19
 
 peripheral.find("modem", rednet.open)
 
@@ -69,9 +69,6 @@ end
 local function RunProgram(program, args)
     shell.run(program, table.unpack(args))
 end
-
-print(url, hook)
-print(hook:sendMessage("startup complete"))
 
 SendFeedback("Running receiver V" .. VERSION)
 
