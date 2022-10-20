@@ -73,6 +73,8 @@ local function RunProgram(program, args)
     end
 end
 
+SendFeedback("Turned on")
+
 while true do
     local id, message, _ = rednet.receive()
 
@@ -116,5 +118,13 @@ while true do
         hook = webhook:createWebhook(hook, os.getComputerLabel())
 
         webhook:saveUrlToFile(url, "Reciever.url")
+    elseif command == "drop" then
+        turtle.drop()
+    elseif command == "return" then
+        local stat = args[2]
+
+        if stat == "fuel" then
+            SendFeedback(turtle.getFuelLevel())
+        end
     end
 end
