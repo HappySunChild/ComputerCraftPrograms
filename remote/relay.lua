@@ -25,13 +25,15 @@ local function Split(inputstr, sep)
 end
 
 local function listen()
-    local id, message = rednet.receive()
-    local args = Split(message, "/")
+    while true do
+        local id, message = rednet.receive()
+        local args = Split(message, "/")
 
-    if args[1] == "Relay" then
-        lastReceived = os.epoch("local") / 1000
+        if args[1] == "Relay" then
+            lastReceived = os.epoch("local") / 1000
 
-        received[args[2]] = args[3]
+            received[args[2]] = args[3]
+        end
     end
 end
 
