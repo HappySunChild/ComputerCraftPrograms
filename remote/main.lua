@@ -136,6 +136,8 @@ while true do
 
         if stat == "fuel" then
             SendFeedback(string.format("Current fuel level: %s.", turtle.getFuelLevel()))
+        elseif stat == "version" then
+            SendFeedback(string.format("Current receiver version: %s", VERSION))
         end
     end
 end
