@@ -47,6 +47,8 @@ local function clear()
                 local args = Split(unsplit)
                 local label, message = args[1], args[2]
 
+                print(label, message)
+
                 embed:addField(label, message, true)
             end
 
