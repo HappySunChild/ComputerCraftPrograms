@@ -32,7 +32,7 @@ local function listen()
         if args[1] == "Relay" then
             lastReceived = os.epoch("local") / 1000
 
-            received[args[2]] = args[3]
+            table.insert(received, args[2] .. "/" .. args[3])
         end
     end
 end
@@ -43,7 +43,10 @@ local function clear()
             -- make a embed and send it to the url
             local embed = hook:createEmbed("Turtle Info", "Turtle information")
 
-            for label, message in pairs(received) do
+            for _, unsplit in pairs(received) do
+                local args = Split(unsplit)
+                local label, message = args[1], args[2]
+
                 embed:addField(label, message, true)
             end
 
