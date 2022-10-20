@@ -32,7 +32,7 @@ function webhook:createWebhook(url, username, avatar_url)
 
     function hook:sendEmbed(embed)
         if embed then
-            send(hook.url, embed.data)
+            send(hook.url, { embeds = embed.data, content = "" })
         end
     end
 
@@ -81,7 +81,7 @@ end
 function webhook:getUrlFromFile(path)
     if fs.exists(path) then
         local file = fs.open(path, "r")
-        local url = file.readLine()
+        local url = file.readAll()
         file.close()
 
         if url and http.checkURL(url) then
@@ -93,18 +93,16 @@ function webhook:getUrlFromFile(path)
 end
 
 function webhook:saveUrlToFile(url, path)
-    if url then
+    if url and path then
         if fs.exists(path) then
             fs.delete(path)
         end
 
-        if not fs.exists(path) then
-            local file = fs.open(path, "w")
-            file.write(url)
-            file.close()
+        local file = fs.open(path, "w")
+        file.write(url)
+        file.close()
 
-            return true
-        end
+        return true
     end
 
     return false
