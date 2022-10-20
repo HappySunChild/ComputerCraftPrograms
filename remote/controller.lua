@@ -343,7 +343,7 @@ while true do
                     local function sendBroadcast()
                         local broadcastMessage = ""
 
-                        broadcastMessage = keymap[downkey]
+                        broadcastMessage = keymap[downkey] or ""
 
                         while true do
                             rednet.broadcast(broadcastMessage)
