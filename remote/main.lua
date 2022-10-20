@@ -1,5 +1,5 @@
 ---@diagnostic disable: undefined-field
-local VERSION = 1.1
+local VERSION = 1.12
 
 peripheral.find("modem", rednet.open)
 
