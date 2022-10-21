@@ -43,11 +43,20 @@ local function clear()
             -- make a embed and send it to the url
             local embed = hook:createEmbed("Turtle Info")
 
-            for _, unsplit in pairs(received) do
+            for i, unsplit in pairs(received) do
                 local args = Split(unsplit, "/")
-                local label, message = args[1], args[2]
 
-                embed:addField(label, message, true)
+                received[i] = args
+            end
+
+            table.sort(received, function(a, b)
+                if tonumber(a[1]) < tonumber(b[1]) then
+                    return true
+                end
+            end)
+
+            for i, t in pairs(received) do
+                embed:addField(t[1], t[2], true)
             end
 
             hook:sendEmbed(embed)
