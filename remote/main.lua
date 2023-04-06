@@ -11,6 +11,7 @@ local programs = {
     ["Bridge.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/remote/bridge.lua",
     ["Refuel.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/remote/lavarefuel.lua",
     ["Tunnel.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/remote/tunnel.lua",
+    ["main.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/remote/main.lua"
 }
 
 local function DownloadPrograms(replace)
@@ -49,7 +50,7 @@ end
 
 DownloadPrograms()
 
-rednet.broadcast(string.format("Startup\\%s\\Idle", os.getComputerLabel()), "TurtleStatus")
+rednet.broadcast(string.format("Startup\\%s\\Idle", os.getComputerLabel() or os.getComputerID()), "TurtleStatus")
 
 while true do
     local id, message = rednet.receive("TurtleCommand")
@@ -80,20 +81,20 @@ while true do
     elseif cmd == "refuel" then
         UpdateStatus("Refueling")
         RunProgram("Refuel.lua")
-    elseif cmd == "Update" then
+    elseif cmd == "update" then
         UpdateStatus("Updating")
         DownloadPrograms(true)
         os.reboot()
-    elseif cmd == "Reboot" then
+    elseif cmd == "reboot" then
         UpdateStatus("Rebooting")
         os.reboot()
-    elseif cmd == "Shutdown" then
+    elseif cmd == "shutdown" then
         UpdateStatus("Offline")
         os.shutdown()
-    elseif cmd == "Dance" then
+    elseif cmd == "dance" then
         UpdateStatus("Dancing")
         RunProgram("dance", args)
-    elseif cmd == "Info" then
+    elseif cmd == "info" then
         rednet.send(id, string.format("Info\\%s\\%s", turtle.getFuelLevel(), turtle.getFuelLimit()), "TurtleStatus")
     end
 end
