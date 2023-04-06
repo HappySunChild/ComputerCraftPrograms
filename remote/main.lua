@@ -52,49 +52,64 @@ DownloadPrograms()
 
 rednet.broadcast(string.format("Startup\\%s\\Idle", os.getComputerLabel() or os.getComputerID()), "TurtleStatus")
 
-while true do
-    local id, message = rednet.receive("TurtleCommand")
-    local args = Split(message)
+local function main()
+    while true do
+        local id, message = rednet.receive("TurtleCommand")
+        local args = Split(message)
 
-    local cmd = args[1]
+        local cmd = args[1]
 
-    table.remove(args, 1)
+        table.remove(args, 1)
 
-    UpdateStatus("Idle")
+        UpdateStatus("Idle")
 
-    if cmd == "go" then
-        RunProgram("go", args)
-    elseif cmd == "dig" then
-        if args[1] == "up" then
-            turtle.digUp()
-        elseif args[1] == "down" then
-            turtle.digDown()
-        else
-            turtle.dig()
+        if cmd == "go" then
+            RunProgram("go", args)
+        elseif cmd == "dig" then
+            if args[1] == "up" then
+                turtle.digUp()
+            elseif args[1] == "down" then
+                turtle.digDown()
+            else
+                turtle.dig()
+            end
+        elseif cmd == "miner" then
+            RunProgram("Miner.lua", args)
+        elseif cmd == "tunnel" then
+            RunProgram("Tunnel.lua", args)
+        elseif cmd == "bridge" then
+            RunProgram("Bridge.lua")
+        elseif cmd == "refuel" then
+            UpdateStatus("Refueling")
+            RunProgram("Refuel.lua")
+        elseif cmd == "update" then
+            UpdateStatus("Updating")
+            DownloadPrograms(true)
+            os.reboot()
+        elseif cmd == "reboot" then
+            UpdateStatus("Rebooting")
+            os.reboot()
+        elseif cmd == "shutdown" then
+            UpdateStatus("Offline")
+            os.shutdown()
+        elseif cmd == "dance" then
+            UpdateStatus("Dancing")
+            RunProgram("dance", args)
+        elseif cmd == "info" then
+            rednet.send(id, string.format("Info\\%s\\%s", turtle.getFuelLevel(), turtle.getFuelLimit()), "TurtleStatus")
         end
-    elseif cmd == "miner" then
-        RunProgram("Miner.lua", args)
-    elseif cmd == "tunnel" then
-        RunProgram("Tunnel.lua", args)
-    elseif cmd == "bridge" then
-        RunProgram("Bridge.lua")
-    elseif cmd == "refuel" then
-        UpdateStatus("Refueling")
-        RunProgram("Refuel.lua")
-    elseif cmd == "update" then
-        UpdateStatus("Updating")
-        DownloadPrograms(true)
-        os.reboot()
-    elseif cmd == "reboot" then
-        UpdateStatus("Rebooting")
-        os.reboot()
-    elseif cmd == "shutdown" then
-        UpdateStatus("Offline")
-        os.shutdown()
-    elseif cmd == "dance" then
-        UpdateStatus("Dancing")
-        RunProgram("dance", args)
-    elseif cmd == "info" then
-        rednet.send(id, string.format("Info\\%s\\%s", turtle.getFuelLevel(), turtle.getFuelLimit()), "TurtleStatus")
     end
 end
+
+local function listener()
+    while true do
+        local id, message = rednet.receive("TurtleStatus")
+
+        if message == "Get" then
+            rednet.send(id, string.format("Startup\\%s\\Idle", os.getComputerLabel() or os.getComputerID()),
+            "TurtleStatus")
+        end
+    end
+end
+
+parallel.waitForAny(main, listener)
