@@ -16,16 +16,20 @@ print("Current Fuel level: " .. turtle.getFuelLevel())
 print("After Fuel Level: " .. turtle.getFuelLevel() - requiredFuel)
 print("")
 
-function math.sign(x)
+local function sign(x)
     return (x > 0) and 1 or (x < 0) and -1 or 0
 end
 
-function math.divisibleBy(x, m)
+local function divisibleBy(x, m)
     return (x % m == 0)
 end
 
-function math.even(x)
+local function even(x)
     return (x % 2 == 0)
+end
+
+local function forward()
+    repeat turtle.dig() until turtle.forward()
 end
 
 if turtle.getFuelLevel() >= requiredFuel then
@@ -33,12 +37,12 @@ if turtle.getFuelLevel() >= requiredFuel then
         local z_start = 1
 
         for z = z_start, Z_Size do
-            for x = math.even(z) and X_Size or 1, math.even(z) and 1 or X_Size, math.even(z) and -1 or 1 do
+            for x = even(z) and X_Size or 1, even(z) and 1 or X_Size, even(z) and -1 or 1 do
                 --print(string.format("X: %s\nY: %s\nZ: %s",x,y,z))
                 turtle.dig()
                 turtle.digDown()
                 turtle.digUp()
-                repeat turtle.dig() until turtle.forward()
+                forward()
             end
 
             turtle.digUp()
@@ -48,24 +52,24 @@ if turtle.getFuelLevel() >= requiredFuel then
                 if z % 2 == 0 then
                     turtle.turnLeft()
                     turtle.dig()
-                    turtle.forward()
+                    forward()
                     turtle.turnLeft()
                 else
                     turtle.turnRight()
                     turtle.dig()
-                    turtle.forward()
+                    forward()
                     turtle.turnRight()
                 end
             end
         end
 
         if y ~= Y_Size then
-            if math.sign(Y_Size) == 1 then
+            if sign(Y_Size) == 1 then
                 for i = 1, 3 do
                     turtle.digUp()
                     turtle.up()
                 end
-            elseif math.sign(Y_Size) == -1 then
+            elseif sign(Y_Size) == -1 then
                 for i = 1, 3 do
                     turtle.digDown()
                     turtle.down()
