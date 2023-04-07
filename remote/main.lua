@@ -74,14 +74,17 @@ local function main()
                 turtle.dig()
             end
         elseif cmd == "miner" then
+            UpdateStatus("Mining")
             RunProgram("Miner.lua", args)
         elseif cmd == "tunnel" then
+            UpdateStatus("Tunneling")
             RunProgram("Tunnel.lua", args)
         elseif cmd == "bridge" then
-            RunProgram("Bridge.lua")
+            UpdateStatus("Bridging")
+            RunProgram("Bridge.lua", args)
         elseif cmd == "refuel" then
             UpdateStatus("Refueling")
-            RunProgram("Refuel.lua")
+            RunProgram("Refuel.lua", args)
         elseif cmd == "update" then
             UpdateStatus("Updating")
             DownloadPrograms(true)
@@ -107,7 +110,7 @@ local function listener()
 
         if message == "Get" then
             rednet.send(id, string.format("Startup\\%s\\Idle", os.getComputerLabel() or os.getComputerID()),
-            "TurtleStatus")
+                "TurtleStatus")
         end
     end
 end
