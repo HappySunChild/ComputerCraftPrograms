@@ -1,5 +1,11 @@
 -- Controller startup.lua
 
+if not (fs.exists("UI.lua")) then
+	print("missing ui library")
+	
+	shell.run("wget", "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/modules/UI.lua", "UI.lua")
+end
+
 local ui = require("UI")
 rednet.open("back")
 
