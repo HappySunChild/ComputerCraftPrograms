@@ -11,7 +11,7 @@ end
 local programs = {
 	["miner.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/turtleremote/programs/miner.lua",
 	["bridge.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/turtleremote/programs/bridge.lua",
-	["refuel.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/turtleremote/programs/lavarefuel.lua",
+	["refuel.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/turtleremote/programs/refuel.lua",
 	["tunnel.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/turtleremote/programs/tunnel.lua",
 }
 
@@ -41,6 +41,8 @@ end
 
 local actions = {
 	miner = function (args)
+		print("running miner.lua", table.concat(args))
+		
 		runProgram("miner.lua", args)
 	end,
 	tunnel = function (args)
@@ -89,7 +91,11 @@ local function main()
 		local callback = actions[action]
 		
 		if callback then
-			xpcall(callback, warn, args)
+			local success = pcall(callback, args)
+			
+			if not success then
+				print("Unable to perform action.")
+			end
 		end
 	end
 end
