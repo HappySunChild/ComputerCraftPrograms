@@ -9,10 +9,10 @@ if neighbor then
 end
 
 local programs = {
-	["miner.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/remote/miner.lua",
-	["bridge.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/remote/bridge.lua",
-	["refuel.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/remote/lavarefuel.lua",
-	["tunnel.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/remote/tunnel.lua",
+	["miner.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/turtleremote/programs/miner.lua",
+	["bridge.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/turtleremote/programs/bridge.lua",
+	["refuel.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/turtleremote/programs/lavarefuel.lua",
+	["tunnel.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/turtleremote/programs/tunnel.lua",
 }
 
 local function runProgram(program, args)
