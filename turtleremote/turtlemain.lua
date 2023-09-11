@@ -1,5 +1,7 @@
 -- Turtle main.lua
 
+print("V1.0")
+
 peripheral.find("modem", rednet.open)
 
 local neighbor = peripheral.find("turtle")
