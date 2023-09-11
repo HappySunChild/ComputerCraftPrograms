@@ -1,6 +1,6 @@
 -- Turtle main.lua
 
-print("V1.0")
+print("V1.1")
 
 peripheral.find("modem", rednet.open)
 
@@ -208,14 +208,4 @@ local function main()
 	end
 end
 
-local function terminate()
-	while (true) do
-		local event = os.pullEventRaw("terminate")
-		
-		if event == "terminate" then
-			broadcastStatus("Offline")
-		end
-	end
-end
-
-parallel.waitForAny(terminate, main)
+main()
