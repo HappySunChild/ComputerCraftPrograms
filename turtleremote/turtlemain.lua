@@ -4,6 +4,8 @@ print("V1.1")
 
 peripheral.find("modem", rednet.open)
 
+local controllerId = -1 -- id of the controller that is sending and receiving data
+
 local neighbor = peripheral.find("turtle")
 
 if neighbor then
@@ -17,13 +19,19 @@ local programs = {
 	["tunnel.lua"] = "https://raw.githubusercontent.com/HappySunChild/ComputerCraftPrograms/main/turtleremote/programs/tunnel.lua",
 }
 
-local function broadcastStatus(status)
+local function updateStatus(status)
+	if controllerId == -1 then
+		print("no controller id")
+		
+		return
+	end
+	
 	local currentFuel = turtle.getFuelLevel()
 	local fuelLimit = turtle.getFuelLimit()
 	
 	local dataString = string.format("%s\\%s\\%d\\%d", os.getComputerLabel(), status, currentFuel, fuelLimit)
 	
-	rednet.broadcast(dataString, "tStatus")
+	rednet.send(controllerId, dataString, "tStatus")
 end
 
 local function runProgram(program, args)
@@ -85,34 +93,34 @@ local handlers = {
 
 local actions = {
 	miner = function (args)
-		broadcastStatus("Mining")
+		updateStatus("Mining")
 		
 		runProgram("miner.lua", args)
 	end,
 	tunnel = function (args)
-		broadcastStatus("Tunneling")
+		updateStatus("Tunneling")
 		
 		runProgram("tunnel.lua", args)
 	end,
 	bridge = function (args)
-		broadcastStatus("Bridging")
+		updateStatus("Bridging")
 		
 		runProgram("bridge.lua", args)
 	end,
 	refuel = function (args)
-		broadcastStatus("Refueling")
+		updateStatus("Refueling")
 		
 		runProgram("refuel.lua", args)
 	end,
 	update = function ()
-		broadcastStatus("Updating")
+		updateStatus("Updating")
 		
 		downloadPrograms(true)
 		
 		os.reboot()
 	end,
 	dance = function ()
-		broadcastStatus("Dancing")
+		updateStatus("Dancing")
 		
 		runProgram("dance")
 	end,
@@ -160,7 +168,7 @@ local actions = {
 		end
 	end,
 	ping = function ()
-		broadcastStatus("Idle")
+		updateStatus("Idle")
 	end,
 	reboot = os.reboot,
 	shutdown = os.shutdown,
@@ -178,34 +186,54 @@ local function split(str, sep)
 	return splitted
 end
 
+local function getController() -- yields
+	rednet.broadcast("get", "controller")
+	
+	local id, message = rednet.receive("controller")
+	
+	if message == "success" then -- "password"
+		controllerId = id
+		
+		return true
+	else
+		print("invalid password")
+		
+		getController()
+	end
+end
+
 downloadPrograms()
 
-local function main()
+local function listener()
+	getController() -- waits for controller to respond
+	
 	while (true) do
-		broadcastStatus("Idle")
-		
 		local id, message, protocol = rednet.receive()
 		
-		if protocol == "tCommand" then
-			local args = split(message)
+		if id == controllerId then
+			updateStatus("Idle")
+			
+			if protocol == "tCommand" then
+				local args = split(message)
 
-			local action = args[1]
-			table.remove(args, 1)
-			
-			local callback = actions[action]
-			
-			if callback then
-				local success, err = pcall(callback, args)
+				local action = args[1]
+				table.remove(args, 1)
 				
-				if (not success) then
-					print("Unable to perform action.")
-					print(err)
+				local callback = actions[action]
+				
+				if callback then
+					local success, err = pcall(callback, args)
+					
+					if (not success) then
+						print("Unable to perform action.")
+						print(err)
+					end
 				end
+			elseif protocol == "ping" then
+				rednet.send(id, "Pong", "pong")
 			end
-		elseif protocol == "ping" then
-			rednet.send(id, "Pong", "pong")
 		end
 	end
 end
 
-main()
+listener()
