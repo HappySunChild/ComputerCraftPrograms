@@ -1,10 +1,7 @@
 -- Turtle main.lua
 
-print("V1.1")
-
-peripheral.find("modem", rednet.open)
-
-local controllerId = -1 -- id of the controller that is sending and receiving data
+local version = 1.2
+local controllerId = -1
 
 local neighbor = peripheral.find("turtle")
 
@@ -205,6 +202,10 @@ end
 downloadPrograms()
 
 local function listener()
+	peripheral.find("modem", rednet.open)
+	
+	print(version)
+	
 	getController() -- waits for controller to respond
 	
 	while (true) do
