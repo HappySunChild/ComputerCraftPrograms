@@ -1,6 +1,6 @@
 -- Turtle main.lua
 
-local version = 1.2
+local version = 1.3
 local controllerId = -1
 
 local neighbor = peripheral.find("turtle")
