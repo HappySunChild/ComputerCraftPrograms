@@ -89,25 +89,23 @@ local handlers = {
 }
 
 local actions = {
-	miner = function (args)
-		updateStatus("Mining")
+	run = function (args)
+		local program = args[1]
 		
-		runProgram("miner.lua", args)
+		if (program) then
+			table.remove(args, 1)
+			
+			runProgram(program, args)
+		end
 	end,
-	tunnel = function (args)
-		updateStatus("Tunneling")
+	pastebin = function (args)
+		updateStatus("Pastebin")
 		
-		runProgram("tunnel.lua", args)
-	end,
-	bridge = function (args)
-		updateStatus("Bridging")
+		local id = args[1]
 		
-		runProgram("bridge.lua", args)
-	end,
-	refuel = function (args)
-		updateStatus("Refueling")
-		
-		runProgram("refuel.lua", args)
+		if (id) then
+			runProgram("pastebin run", args)
+		end
 	end,
 	update = function ()
 		updateStatus("Updating")
@@ -115,11 +113,6 @@ local actions = {
 		downloadPrograms(true)
 		
 		os.reboot()
-	end,
-	dance = function ()
-		updateStatus("Dancing")
-		
-		runProgram("dance")
 	end,
 	go = function (args)
 		local n = 1
@@ -184,11 +177,13 @@ local function split(str, sep)
 end
 
 local function getController() -- yields
-	rednet.broadcast("get", "controller")
+	rednet.broadcast("get", "controllerRequest")
 	
-	local id, message = rednet.receive("controller")
+	local id, message = rednet.receive("controllerResponse")
 	
 	if message == "success" then -- "password"
+		print("found controller!")
+		
 		controllerId = id
 		
 		return true
@@ -205,6 +200,7 @@ local function listener()
 	peripheral.find("modem", rednet.open)
 	
 	print(version)
+	print("\nwaiting for controller...")
 	
 	getController() -- waits for controller to respond
 	
