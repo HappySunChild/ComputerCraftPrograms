@@ -183,7 +183,7 @@ local function getController() -- yields
 	local id, message = rednet.receive("controllerResponse")
 	
 	if message == "success" then -- "password"
-		print("found controller!")
+		print("cotnroller found!")
 		
 		controllerId = id
 		
@@ -197,7 +197,7 @@ end
 
 downloadPrograms()
 
-local function listener()
+local function main()
 	peripheral.find("modem", rednet.open)
 	
 	print(version)
@@ -234,4 +234,4 @@ local function listener()
 	end
 end
 
-listener()
+main()
