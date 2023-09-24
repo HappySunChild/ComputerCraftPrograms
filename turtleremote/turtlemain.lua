@@ -1,6 +1,6 @@
 -- Turtle main.lua
 
-local version = 1.3
+local version = 1.4
 local controllerId = -1
 
 local neighbor = peripheral.find("turtle")
@@ -183,7 +183,7 @@ local function getController() -- yields
 	local id, message = rednet.receive("controllerResponse")
 	
 	if message == "success" then -- "password"
-		print("cotnroller found!")
+		print("controller found!")
 		
 		controllerId = id
 		
